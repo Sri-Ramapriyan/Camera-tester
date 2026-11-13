@@ -9,10 +9,13 @@ jobs:
         with: {distribution: temurin, java-version: 17}
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
-        with: {gradle-version: "8.4"}
-      - run: unzip -q CameraTester.zip
-      - run: cd CameraTester && gradle assembleDebug --no-daemon
+        with: {gradle-version: "8.4"}  
+      - run: |
+          ZIP=$(find . -name "CameraTester.zip" | head -1)
+          [ -n "$ZIP" ] && unzip -q "$ZIP" -d build_src || true
+          DIR=$(dirname "$(find . -name settings.gradle | head -1)")
+          cd "$DIR" && gradle assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: CameraTester-apk
-          path: CameraTester/app/build/outputs/apk/debug/app-debug.apk
+          path: "**/app/build/outputs/apk/debug/app-debug.apk"
